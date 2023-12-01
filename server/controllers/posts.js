@@ -24,6 +24,23 @@ const getAllPosts = async (req, res) => {
   }
 }
 
+const getUserPosts = async (req, res) => {
+  try {
+    const userID = req.params.userID
+
+    const posts = await Post.find({ authorID: userID })
+
+    if (!posts) {
+      return res.json({ message: "No posts found!" })
+    }
+
+    res.status(200).json({ posts })
+  } catch (error) {
+    console.error("Error fetching post:", error)
+    res.status(500).json({ message: "Internal Server Error" })
+  }
+}
+
 const createPost = async (req, res) => {
   const newPost = new Post(req.body)
 
@@ -57,4 +74,11 @@ const deletePost = async (req, res) => {
   res.status(200).json({ message: `Post removed successfully!` })
 }
 
-export { getPost, getAllPosts, createPost, updatePost, deletePost }
+export {
+  getPost,
+  getAllPosts,
+  getUserPosts,
+  createPost,
+  updatePost,
+  deletePost,
+}

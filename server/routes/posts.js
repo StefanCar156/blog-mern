@@ -3,6 +3,7 @@ import { verifyToken } from "../middleware/auth.js"
 import {
   getPost,
   getAllPosts,
+  getUserPosts,
   createPost,
   updatePost,
   deletePost,
@@ -11,6 +12,7 @@ import {
 const router = express.Router()
 
 router.route("/").get(getAllPosts).post(verifyToken, createPost)
+router.route("/user/:userID").get(getUserPosts)
 router
   .route("/:postID")
   .get(getPost)

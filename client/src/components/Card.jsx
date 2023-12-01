@@ -7,16 +7,20 @@ const Card = ({ post }) => {
   const authorName = useGetAuthorName(post.authorID)
 
   return (
-    <article className="max-w-sm rounded overflow-hidden shadow-lg mx-4 my-4">
+    <article className="max-w-sm rounded overflow-hidden shadow-lg my-4 flex flex-col h-full">
       <img
         className="w-full h-32 object-cover"
         src={post.imageUrl}
         alt={post.title}
       />
-      <div className="px-6 py-4">
+      <div className="flex-grow px-6 py-4 flex flex-col">
         <h1 className="font-bold text-xl mb-2">{post.title}</h1>
         <h2 className="text-gray-600 text-sm mb-2">{authorName}</h2>
-        <p className="text-gray-700 text-base">{post.content}</p>
+        <p className="text-gray-700 text-base flex-grow">
+          {post.content.length < 80
+            ? post.content
+            : post.content.substr(0, 77) + "..."}
+        </p>
       </div>
       <div className="px-6 py-4">
         <Link to={`/post/${post._id}`}>

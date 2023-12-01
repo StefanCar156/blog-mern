@@ -55,6 +55,21 @@ const login = async (req, res) => {
   res.json({ token, userID: user._id })
 }
 
+const getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userID)
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" })
+    }
+
+    res.status(200).json({ user })
+  } catch (error) {
+    console.error("Error fetching user:", error)
+    res.status(500).json({ message: "Internal Server Error" })
+  }
+}
+
 const getUserName = async (req, res) => {
   try {
     const user = await User.findById(req.params.userID)
@@ -65,11 +80,11 @@ const getUserName = async (req, res) => {
 
     const { username } = user
 
-    res.json({ username })
+    res.status(200).json({ username })
   } catch (error) {
     console.error("Error fetching user:", error)
     res.status(500).json({ message: "Internal Server Error" })
   }
 }
 
-export { register, login, getUserName }
+export { register, login, getUser, getUserName }

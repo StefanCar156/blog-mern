@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
 import { useGetAuthorName } from "../hooks/useGetAuthorName"
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams, useNavigate, Link } from "react-router-dom"
 import axios from "axios"
 import { FaEdit, FaRegTrashAlt } from "react-icons/fa"
 import { toast } from "react-toastify"
 import { useCookies } from "react-cookie"
+import readingTime from "reading-time/lib/reading-time"
 
 const Post = () => {
   const { postID } = useParams()
@@ -13,6 +14,7 @@ const Post = () => {
   const [isPostAuthor, setIsPostAuthor] = useState(false)
   const navigate = useNavigate()
   const [cookies, _] = useCookies(["blog_token"])
+  const [readTime, setReadTime] = useState("")
 
   useEffect(() => {
     if (localStorage.getItem("userID") === post.authorID) setIsPostAuthor(true)
@@ -32,6 +34,10 @@ const Post = () => {
 
     fetchPost()
   }, [postID])
+
+  useEffect(() => {
+    if (post.content) setReadTime(readingTime(post.content).text)
+  }, [post.content])
 
   const handleEditPost = () => {
     navigate(`/post/edit/${postID}`)
@@ -56,33 +62,43 @@ const Post = () => {
   }
 
   return (
-    <div className="mt-8 p-8 bg-white flex flex-col items-center">
-      <img
-        src={post.imageUrl}
-        alt={post.title}
-        className="mb-4 rounded w-1/2"
-      />
-      <h1 className="text-3xl font-semibold mb-4">{post.title}</h1>
-      <p className="text-sm text-gray-500">Author: {authorName}</p>
-      <p className="text-gray-700 mb-4 self-start">{post.content}</p>
-      {isPostAuthor && (
-        <div className="flex space-x-2">
-          <button
-            onClick={handleEditPost}
-            className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue"
-          >
-            <FaEdit className="inline-block mr-2" /> <span>Edit Post</span>
-          </button>
-          <button
-            onClick={handleRemovePost}
-            className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:shadow-outline-red"
-          >
-            <FaRegTrashAlt className="inline-block mr-2" />{" "}
-            <span>Remove Post</span>
-          </button>
-        </div>
-      )}
-    </div>
+    post && (
+      <div className="mt-8 p-8 bg-white flex flex-col items-center">
+        <img
+          src={post.imageUrl}
+          alt={post.title}
+          className="mb-4 rounded w-1/2"
+        />
+        <h1 className="text-3xl font-semibold mb-4">{post.title}</h1>
+        <p className="text-sm text-gray-500">
+          Author:{" "}
+          <span className="font-bold">
+            <Link to={`/user/${post.authorID}`}>{authorName}</Link>
+          </span>
+        </p>
+        <p className="text-sm text-gray-500">Read time: {readTime}</p>
+        <p className="text-gray-700 my-6 self-start text-justify">
+          {post.content}
+        </p>
+        {isPostAuthor && (
+          <div className="flex space-x-2">
+            <button
+              onClick={handleEditPost}
+              className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue"
+            >
+              <FaEdit className="inline-block mr-2" /> <span>Edit Post</span>
+            </button>
+            <button
+              onClick={handleRemovePost}
+              className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:shadow-outline-red"
+            >
+              <FaRegTrashAlt className="inline-block mr-2" />{" "}
+              <span>Remove Post</span>
+            </button>
+          </div>
+        )}
+      </div>
+    )
   )
 }
 

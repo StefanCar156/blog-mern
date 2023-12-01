@@ -2,10 +2,12 @@ import React from "react"
 import { Link } from "react-router-dom"
 import { useCookies } from "react-cookie"
 import { useNavigate } from "react-router-dom"
+import { useGetUserID } from "../hooks/useGetUserID"
 
 const Navbar = ({ onLogout }) => {
   const [cookies, _] = useCookies(["blog_token"])
   const navigate = useNavigate()
+  const userID = useGetUserID()
 
   const logout = () => {
     onLogout()
@@ -28,6 +30,9 @@ const Navbar = ({ onLogout }) => {
         </>
       ) : (
         <div className="flex items-center ml-auto space-x-4">
+          <Link to={`/user/${userID}`} className="text-blue-400">
+            Profile
+          </Link>
           <Link to="/post/create" className="text-blue-400">
             Create new post
           </Link>

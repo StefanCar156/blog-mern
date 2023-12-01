@@ -14,6 +14,8 @@ import Navbar from "./components/Navbar"
 import Post from "./pages/Post"
 import CreatePost from "./pages/CreatePost"
 import { CookiesProvider, useCookies } from "react-cookie"
+import User from "./pages/User"
+import AccountSettings from "./pages/AccountSettings"
 
 function App() {
   const [cookies, setCookie] = useCookies(["blog_token"])
@@ -58,6 +60,17 @@ function App() {
                   )
                 }
               />
+              <Route
+                path="/user/settings"
+                element={
+                  cookies.blog_token ? (
+                    <AccountSettings />
+                  ) : (
+                    <Navigate to="/auth/login" />
+                  )
+                }
+              />
+              <Route path="/user/:userID" element={<User />} />
               <Route path="/post/:postID" element={<Post />} />
               <Route
                 path="/post/create"

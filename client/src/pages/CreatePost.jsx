@@ -46,6 +46,11 @@ const CreatePost = () => {
     setErrors({ ...errors, [name]: "" })
   }
 
+  const isValidUrl = (url) => {
+    const urlRegex = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/
+    return urlRegex.test(url)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
 
@@ -71,14 +76,18 @@ const CreatePost = () => {
       }
     })
 
+    if (!isValidUrl(post.imageUrl)) {
+      newErrors.imageUrl = "Invalid URL"
+    }
+
     // If there are errors, update the state and prevent form submission
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
+      return
     }
 
     if (postID) {
       // Update Post
-
       try {
         const res = await axios.patch(
           `http://localhost:5000/api/v1/posts/${postID}`,

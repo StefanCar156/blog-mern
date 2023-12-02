@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { useCookies } from "react-cookie"
 import { useNavigate } from "react-router-dom"
 import { useGetUserID } from "../hooks/useGetUserID"
+import SearchBar from "./SearchBar"
 
 const Navbar = ({ onLogout }) => {
   const [cookies, _] = useCookies(["blog_token"])
@@ -15,10 +16,11 @@ const Navbar = ({ onLogout }) => {
   }
 
   return (
-    <nav className="bg-gray-800 p-4 text-white flex">
+    <nav className="bg-gray-800 p-4 text-white flex items-center gap-10">
       <Link to="/" className="text-l font-semibold">
         Home
       </Link>
+      {cookies.blog_token && <SearchBar />}
       {!cookies.blog_token ? (
         <>
           <Link to="/auth/login" className="ml-auto">

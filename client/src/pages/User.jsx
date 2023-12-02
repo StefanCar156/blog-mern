@@ -71,11 +71,15 @@ const User = () => {
       </div>
       <section className="mb-8">
         <h3 className="text-2xl font-bold mb-4">{user.username}'s posts</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {posts.map((post) => (
-            <Card key={post._id} post={post} />
-          ))}
-        </div>
+        {posts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {posts.map((post) => (
+              <Card key={post._id} post={post} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-lg mt-6">No posts yet</p>
+        )}
       </section>
     </div>
   )

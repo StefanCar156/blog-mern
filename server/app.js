@@ -9,6 +9,7 @@ const app = express()
 // Routers
 import authRouter from "./routes/auth.js"
 import postsRouter from "./routes/posts.js"
+import searchRouter from "./routes/search.js"
 
 // Middleware
 app.use(express.json())
@@ -17,6 +18,7 @@ app.use(cors())
 // Routes
 app.use("/api/v1/auth", authRouter)
 app.use("/api/v1/posts", postsRouter)
+app.use("/api/v1/search", searchRouter)
 
 // PORT
 const PORT = 5000

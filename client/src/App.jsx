@@ -16,6 +16,7 @@ import CreatePost from "./pages/CreatePost"
 import { CookiesProvider, useCookies } from "react-cookie"
 import User from "./pages/User"
 import AccountSettings from "./pages/AccountSettings"
+import SearchResults from "./pages/SearchResults"
 
 function App() {
   const [cookies, setCookie] = useCookies(["blog_token"])
@@ -42,6 +43,16 @@ function App() {
                 path="/"
                 element={
                   cookies.blog_token ? <Home /> : <Navigate to="/auth/login" />
+                }
+              />
+              <Route
+                path="/search"
+                element={
+                  cookies.blog_token ? (
+                    <SearchResults />
+                  ) : (
+                    <Navigate to="/auth/login" />
+                  )
                 }
               />
               <Route

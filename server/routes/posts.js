@@ -4,6 +4,7 @@ import {
   getPost,
   getAllPosts,
   getUserPosts,
+  getRecommendedPosts,
   createPost,
   updatePost,
   deletePost,
@@ -18,5 +19,6 @@ router
   .get(getPost)
   .patch(verifyToken, updatePost)
   .delete(verifyToken, deletePost)
+router.route("/:postID/recommended").get(getRecommendedPosts)
 
 export default router

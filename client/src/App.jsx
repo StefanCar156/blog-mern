@@ -7,29 +7,22 @@ import {
 } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.min.css"
+import { CookiesProvider, useCookies } from "react-cookie"
 import Home from "./pages/Home"
 import Register from "./pages/Register"
 import Login from "./pages/Login"
 import Navbar from "./components/Navbar"
 import Post from "./pages/Post"
 import CreatePost from "./pages/CreatePost"
-import { CookiesProvider, useCookies } from "react-cookie"
 import User from "./pages/User"
 import AccountSettings from "./pages/AccountSettings"
 import SearchResults from "./pages/SearchResults"
+import { useGlobalContext } from "./context/globalContext"
 
 function App() {
-  const [cookies, setCookie] = useCookies(["blog_token"])
+  const { handleLogin, handleLogout } = useGlobalContext()
 
-  const handleLogin = ({ user, token }) => {
-    setCookie("blog_token", token, { path: "/" })
-    localStorage.setItem("userID", user)
-  }
-
-  const handleLogout = () => {
-    setCookie("blog_token", "")
-    localStorage.removeItem("userID")
-  }
+  const [cookies] = useCookies(["blog_token"])
 
   return (
     <CookiesProvider>

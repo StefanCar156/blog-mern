@@ -41,6 +41,27 @@ const getUserPosts = async (req, res) => {
   }
 }
 
+const getRecommendedPosts = async (req, res) => {
+  try {
+    const currentPost = await Post.findById(req.params.postID)
+
+    if (!currentPost) {
+      return res.status(404).json({ message: "Post not found" })
+    }
+
+    const recommendedPosts = await Post.find({
+      _id: { $ne: currentPost._id },
+    })
+      .sort({ createdAt: -1 })
+      .limit(3)
+
+    res.json({ recommendedPosts })
+  } catch (error) {
+    console.error("Error fetching recommended posts:", error)
+    res.status(500).json({ message: "Internal Server Error" })
+  }
+}
+
 const createPost = async (req, res) => {
   const newPost = new Post(req.body)
 
@@ -78,6 +99,7 @@ export {
   getPost,
   getAllPosts,
   getUserPosts,
+  getRecommendedPosts,
   createPost,
   updatePost,
   deletePost,

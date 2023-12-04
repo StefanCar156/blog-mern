@@ -57,7 +57,7 @@ const login = async (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.userID)
+    const user = await User.findById(req.params.userID).select("-password")
 
     if (!user) {
       return res.status(404).json({ message: "User not found" })
@@ -87,4 +87,39 @@ const getUserName = async (req, res) => {
   }
 }
 
-export { register, login, getUser, getUserName }
+const changeUserInfo = async (req, res) => {
+  try {
+    const { username, email, currentPassword, newPassword } = req.body
+
+    // Find user by ID
+    const user = await User.findById(req.body._id)
+
+    // Check if provided current password matches the one in the database
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password)
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Current password is incorrect" })
+    }
+
+    // Update username and email
+    user.username = username
+    user.email = email
+
+    // If newPassword is provided, update password
+    if (newPassword) {
+      const hashedPassword = await bcrypt.hash(newPassword, 10)
+      user.password = hashedPassword
+    }
+
+    // Save changes
+    await user.save()
+
+    res
+      .status(200)
+      .json({ message: "Account information updated successfully" })
+  } catch (error) {
+    console.error("Error updating account information:", error)
+    res.status(500).json({ message: "Internal Server Error" })
+  }
+}
+
+export { register, login, getUser, getUserName, changeUserInfo }

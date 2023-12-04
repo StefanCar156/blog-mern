@@ -6,6 +6,7 @@ import { FaEdit, FaRegTrashAlt } from "react-icons/fa"
 import { toast } from "react-toastify"
 import { useCookies } from "react-cookie"
 import readingTime from "reading-time/lib/reading-time"
+import Card from "../components/Card"
 
 const Post = () => {
   const { postID } = useParams()
@@ -15,6 +16,7 @@ const Post = () => {
   const navigate = useNavigate()
   const [cookies, _] = useCookies(["blog_token"])
   const [readTime, setReadTime] = useState("")
+  const [recommendedPosts, setRecommendedPosts] = useState([])
 
   useEffect(() => {
     if (localStorage.getItem("userID") === post.authorID) setIsPostAuthor(true)
@@ -38,6 +40,21 @@ const Post = () => {
   useEffect(() => {
     if (post.content) setReadTime(readingTime(post.content).text)
   }, [post.content])
+
+  useEffect(() => {
+    const fetchRecommendedPosts = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/v1/posts/${postID}/recommended`
+        )
+        setRecommendedPosts(res.data.recommendedPosts)
+      } catch (error) {
+        console.error("Error fetching recommended posts:", error)
+      }
+    }
+
+    fetchRecommendedPosts()
+  }, [postID])
 
   const handleEditPost = () => {
     navigate(`/post/edit/${postID}`)
@@ -63,40 +80,54 @@ const Post = () => {
 
   return (
     post && (
-      <div className="mt-8 p-8 bg-white flex flex-col items-center">
-        <img
-          src={post.imageUrl}
-          alt={post.title}
-          className="mb-4 rounded w-1/2"
-        />
-        <h1 className="text-3xl font-semibold mb-4">{post.title}</h1>
-        <p className="text-sm text-gray-500">
-          Author:{" "}
-          <span className="font-bold">
-            <Link to={`/user/${post.authorID}`}>{authorName}</Link>
-          </span>
-        </p>
-        <p className="text-sm text-gray-500">Read time: {readTime}</p>
-        <p className="text-gray-700 my-6 self-start text-justify">
-          {post.content}
-        </p>
-        {isPostAuthor && (
-          <div className="flex space-x-2">
-            <button
-              onClick={handleEditPost}
-              className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue"
-            >
-              <FaEdit className="inline-block mr-2" /> <span>Edit Post</span>
-            </button>
-            <button
-              onClick={handleRemovePost}
-              className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:shadow-outline-red"
-            >
-              <FaRegTrashAlt className="inline-block mr-2" />{" "}
-              <span>Remove Post</span>
-            </button>
-          </div>
-        )}
+      <div className="mt-8 p-8 bg-white flex flex-col">
+        <section className="pb-8">
+          <img
+            src={post.imageUrl}
+            alt={post.title}
+            className="mb-4 rounded w-1/2"
+          />
+          <h1 className="text-3xl font-semibold mb-4">{post.title}</h1>
+          <p className="text-sm text-gray-500">
+            Author:{" "}
+            <span className="font-bold">
+              <Link to={`/user/${post.authorID}`}>{authorName}</Link>
+            </span>
+          </p>
+          <p className="text-sm text-gray-500">Read time: {readTime}</p>
+          <p className="text-gray-700 my-6 self-start text-justify">
+            {post.content}
+          </p>
+          {isPostAuthor && (
+            <div className="flex space-x-2">
+              <button
+                onClick={handleEditPost}
+                className="flex items-center bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue"
+              >
+                <FaEdit className="inline-block mr-2" /> <span>Edit Post</span>
+              </button>
+              <button
+                onClick={handleRemovePost}
+                className="flex items-center bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:shadow-outline-red"
+              >
+                <FaRegTrashAlt className="inline-block mr-2" />{" "}
+                <span>Remove Post</span>
+              </button>
+            </div>
+          )}
+        </section>
+        <section className="border-t border-gray-300 pt-6">
+          {recommendedPosts.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold mb-4">Read This</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {recommendedPosts.map((recommendedPost) => (
+                  <Card key={recommendedPost._id} post={recommendedPost} />
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
       </div>
     )
   )

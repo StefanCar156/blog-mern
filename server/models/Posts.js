@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import Comment from "./Comment.js"
 
 const PostSchema = mongoose.Schema(
   {
@@ -16,8 +17,10 @@ const PostSchema = mongoose.Schema(
     },
     authorID: {
       type: mongoose.Types.ObjectId,
+      ref: "User",
       required: true,
     },
+    comments: [Comment.schema],
   },
   { timestamps: { createdAt: true, updatedAt: false } }
 )

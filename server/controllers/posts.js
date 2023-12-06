@@ -1,4 +1,5 @@
 import Post from "../models/Posts.js"
+import Comment from "../models/Comment.js"
 
 const getPost = async (req, res) => {
   try {
@@ -95,6 +96,53 @@ const deletePost = async (req, res) => {
   res.status(200).json({ message: `Post removed successfully!` })
 }
 
+// Comments
+
+const getComments = async (req, res) => {
+  try {
+    const postID = req.params.postID
+    const post = await Post.findById(postID).select("comments")
+
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" })
+    }
+
+    const comments = post.comments
+    return res.status(200).json({ comments })
+  } catch (error) {
+    console.error("Error fetching comments:", error)
+    res.status(500).json({ error: "Internal Server Error" })
+  }
+}
+
+const addComment = async (req, res) => {
+  const { postID } = req.params
+  const { content } = req.body
+
+  try {
+    const post = await Post.findById(postID)
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" })
+    }
+
+    const comment = new Comment({
+      author: req.body.userID,
+      authorName: req.body.username,
+      content,
+    })
+
+    post.comments.push(comment)
+
+    await post.save()
+
+    res.status(201).json({ message: "Comment added successfully", comment })
+  } catch (error) {
+    console.error("Error adding comment:", error)
+    res.status(500).json({ message: "Internal server error" })
+  }
+}
+
 export {
   getPost,
   getAllPosts,
@@ -103,4 +151,6 @@ export {
   createPost,
   updatePost,
   deletePost,
+  getComments,
+  addComment,
 }

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 import { Link, useSearchParams } from "react-router-dom"
+import { useGlobalContext } from "../context/globalContext"
 
 const SearchResults = () => {
   const [searchResults, setSearchResults] = useState({ posts: [], users: [] })
   const [searchParams] = useSearchParams()
   const query = searchParams.get("query")
+  const { setShowSearchDropdown } = useGlobalContext()
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -23,6 +25,10 @@ const SearchResults = () => {
 
     fetchSearchResults()
   }, [query])
+
+  useEffect(() => {
+    setShowSearchDropdown(false)
+  }, [])
 
   return (
     <div className="container px-6 mt-8">

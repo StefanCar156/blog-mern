@@ -8,6 +8,8 @@ import {
   createPost,
   updatePost,
   deletePost,
+  getComments,
+  addComment,
 } from "../controllers/posts.js"
 
 const router = express.Router()
@@ -20,5 +22,6 @@ router
   .patch(verifyToken, updatePost)
   .delete(verifyToken, deletePost)
 router.route("/:postID/recommended").get(getRecommendedPosts)
+router.route("/:postID/comments").get(getComments).post(verifyToken, addComment)
 
 export default router

@@ -7,16 +7,23 @@ import { toast } from "react-toastify"
 import { useCookies } from "react-cookie"
 import readingTime from "reading-time/lib/reading-time"
 import Card from "../components/Card"
+import Comments from "../components/Comments"
+import { useGetUserID } from "../hooks/useGetUserID"
+import { useGlobalContext } from "../context/globalContext"
 
 const Post = () => {
   const { postID } = useParams()
   const [post, setPost] = useState({})
   const authorName = useGetAuthorName(post.authorID)
+  const userID = useGetUserID()
   const [isPostAuthor, setIsPostAuthor] = useState(false)
   const navigate = useNavigate()
   const [cookies, _] = useCookies(["blog_token"])
   const [readTime, setReadTime] = useState("")
   const [recommendedPosts, setRecommendedPosts] = useState([])
+  const [comments, setComments] = useState([])
+  const [newComment, setNewComment] = useState("")
+  const { currentUser } = useGlobalContext()
 
   useEffect(() => {
     if (localStorage.getItem("userID") === post.authorID) setIsPostAuthor(true)
@@ -56,6 +63,21 @@ const Post = () => {
     fetchRecommendedPosts()
   }, [postID])
 
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:5000/api/v1/posts/${postID}/comments`
+        )
+        setComments(response.data.comments)
+      } catch (error) {
+        console.error("Error fetching comments:", error)
+      }
+    }
+
+    fetchComments()
+  }, [postID])
+
   const handleEditPost = () => {
     navigate(`/post/edit/${postID}`)
   }
@@ -75,6 +97,27 @@ const Post = () => {
       }
     } catch (error) {
       console.error("Error deleting post:", error)
+    }
+  }
+
+  const handleAddComment = async (postId, content) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:5000/api/v1/posts/${postId}/comments`,
+        {
+          content,
+          userID,
+          username: currentUser.username,
+        },
+        { headers: { authorization: cookies.blog_token } }
+      )
+
+      const newComment = response.data.comment
+
+      setComments((prevComments) => [...prevComments, newComment])
+    } catch (error) {
+      console.error("Error adding comment:", error)
+      toast.error("Error adding comment. Please try again.")
     }
   }
 
@@ -116,9 +159,14 @@ const Post = () => {
             </div>
           )}
         </section>
+        <Comments
+          comments={comments}
+          postId={postID}
+          onAddComment={handleAddComment}
+        />
         <section className="border-t border-gray-300 pt-6">
           {recommendedPosts.length > 0 && (
-            <div className="mt-8">
+            <div>
               <h2 className="text-xl font-semibold mb-4">Read This</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {recommendedPosts.map((recommendedPost) => (

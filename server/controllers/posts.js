@@ -18,24 +18,37 @@ const getPost = async (req, res) => {
 
 const getAllPosts = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1
+    const perPage = parseInt(req.query.perPage) || 8
+
+    const totalPosts = await Post.countDocuments()
+    const totalPages = Math.ceil(totalPosts / perPage)
+
     const posts = await Post.find({})
-    res.json({ posts })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+
+    res.json({ posts, totalPages })
   } catch (error) {
-    res.json(error)
+    console.error("Error fetching post:", error)
+    res.status(500).json({ message: "Internal Server Error" })
   }
 }
 
 const getUserPosts = async (req, res) => {
   try {
     const userID = req.params.userID
+    const page = parseInt(req.query.page) || 1
+    const perPage = parseInt(req.query.perPage) || 8
+
+    const totalPosts = await Post.countDocuments({ authorID: userID })
+    const totalPages = Math.ceil(totalPosts / perPage)
 
     const posts = await Post.find({ authorID: userID })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
 
-    if (!posts) {
-      return res.json({ message: "No posts found!" })
-    }
-
-    res.status(200).json({ posts })
+    res.status(200).json({ posts, totalPages })
   } catch (error) {
     console.error("Error fetching post:", error)
     res.status(500).json({ message: "Internal Server Error" })

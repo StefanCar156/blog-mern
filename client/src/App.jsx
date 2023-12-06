@@ -26,7 +26,7 @@ function App() {
 
   return (
     <CookiesProvider>
-      <div className="app">
+      <div className="app pb-8">
         <Router>
           <ToastContainer />
           <Navbar onLogout={handleLogout} />

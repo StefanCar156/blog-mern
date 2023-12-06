@@ -4,8 +4,10 @@ import { useGetUserID } from "../hooks/useGetUserID"
 import { useCookies } from "react-cookie"
 import { toast } from "react-toastify"
 import { useNavigate } from "react-router-dom"
+import { useGlobalContext } from "../context/globalContext"
 
 const AccountSettings = () => {
+  const { currentUser } = useGlobalContext()
   const [userData, setUserData] = useState({
     username: "",
     email: "",
@@ -21,19 +23,8 @@ const AccountSettings = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/api/v1/auth/users/${userID}`
-        )
-        setUserData(response.data.user)
-      } catch (error) {
-        console.error("Error fetching user data:", error)
-      }
-    }
-
-    fetchUserData()
-  }, [])
+    setUserData(currentUser || userData)
+  }, [currentUser])
 
   const handleChange = (e) => {
     setUserData({

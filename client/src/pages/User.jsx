@@ -4,12 +4,17 @@ import axios from "axios"
 import Card from "../components/Card"
 import { useGetUserID } from "../hooks/useGetUserID.js"
 import { IoSettingsSharp } from "react-icons/io5"
+import Pagination from "../components/Pagination"
 
 const User = () => {
   const [user, setUser] = useState({})
   const [posts, setPosts] = useState([])
   const { userID } = useParams()
   const [isUsersProfile, setIsUsersProfile] = useState(false)
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1)
+  const postsPerPage = 8
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,7 +30,7 @@ const User = () => {
     }
 
     fetchUser()
-  }, [])
+  }, [userID])
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -41,14 +46,21 @@ const User = () => {
     }
 
     fetchPosts()
-  }, [])
+  }, [userID])
 
   useEffect(() => {
     if (userID === useGetUserID()) setIsUsersProfile(true)
   }, [])
 
+  // Pagination
+  const indexOfLastPost = currentPage * postsPerPage
+  const indexOfFirstPost = indexOfLastPost - postsPerPage
+  const currentPosts = posts.slice(indexOfFirstPost, indexOfLastPost)
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber)
+
   return (
-    <div className="container px-8 mt-8 mb-8">
+    <div className="container px-8 mt-8 mb-8 flex flex-col">
       <div className="flex items-center mb-8 gap-4 w-full">
         <img
           src="https://static.thenounproject.com/png/1095867-200.png"
@@ -71,15 +83,22 @@ const User = () => {
       </div>
       <section className="mb-8">
         <h3 className="text-2xl font-bold mb-4">{user.username}'s posts</h3>
-        {posts.length > 0 ? (
+        {currentPosts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {posts.map((post) => (
+            {currentPosts.map((post) => (
               <Card key={post._id} post={post} />
             ))}
           </div>
         ) : (
           <p className="text-gray-500 text-lg mt-6">No posts yet</p>
         )}
+
+        <Pagination
+          postsPerPage={postsPerPage}
+          totalPosts={posts.length}
+          paginate={paginate}
+          currentPage={currentPage}
+        />
       </section>
     </div>
   )
